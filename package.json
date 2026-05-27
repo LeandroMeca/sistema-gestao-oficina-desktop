@@ -1,0 +1,39 @@
+{
+  "name": "mecanica-parente",
+  "version": "1.0.1",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "dist": "electron-builder"
+  },
+  "build": {
+    "appId": "com.oficina.parente",
+    "productName": "Oficina Parente",
+    "directories": {
+      "output": "release/"
+    },
+    "win": {
+      "target": "nsis"
+    },
+    "files": [
+      "main.js",
+      "preload.js",
+      "database/**/*",
+      {
+        "from": "mecanica-parente-electron/frontend/dist/oficina/browser/browser",
+        "to": "frontend-app",
+        "filter": [
+          "**/*"
+        ]
+      }
+    ]
+  },
+  "dependencies": {
+    "sqlite3": "^6.0.1",
+    "typeorm": "^0.3.20"
+  },
+  "devDependencies": {
+    "electron": "22.3.27",
+    "electron-builder": "^24.13.3"
+  }
+}

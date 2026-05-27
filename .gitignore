@@ -1,0 +1,54 @@
+# Node modules
+node_modules/
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# VS Code
+.vscode/
+
+# Editor temp files
+*.swp
+*~
+
+# Build outputs
+/dist
+/dist-*/
+/release
+/win-unpacked
+/tmp_asar_extract
+
+# Angular build
+mecanica-parente-electron/frontend/dist/
+
+# Electron
+**/node_modules/**/node_modules
+
+# SQLite DB
+*.sqlite
+*.db
+database/*.sqlite
+database/*.db
+
+# Environment files
+.env
+
+# Mac/Linux
+.idea/
+
+# Misc
+*.log
+
+# Package-lock
+package-lock.json
+
+# Optional: include lockfiles if you want reproducible builds
+# pnpm-lock.yaml
+# yarn.lock

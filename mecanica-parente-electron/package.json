@@ -1,0 +1,22 @@
+{
+  "name": "mecanica-parente-electron",
+  "version": "1.0.0",
+  "description": "",
+  "main": "../main.js",
+  "scripts": {
+    "ng": "ng",
+    "start": "ng serve",
+    "build": "ng build --base-href ./",
+    "watch": "ng build --watch --configuration development",
+    "test": "ng test",
+    "electron:start": "electron .",
+    "electron:build": "npm run build && electron-builder build --win"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "electron": "^42.0.1",
+    "electron-builder": "^26.8.1"
+  }
+}
