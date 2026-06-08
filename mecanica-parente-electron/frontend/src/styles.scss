@@ -1,0 +1,10 @@
+/* Em vez de tentar importar um arquivo que ele não acha, nós chamamos as diretivas nativas do Tailwind */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  background-color: #f3f4f6;
+  margin: 0;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}

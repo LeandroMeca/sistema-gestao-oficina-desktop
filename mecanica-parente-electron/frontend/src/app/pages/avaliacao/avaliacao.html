@@ -1,0 +1,249 @@
+<div class="max-w-6xl mx-auto pb-10 animate-fade-in">
+  <div class="mb-6 flex justify-between items-end">
+    <div>
+      <h2 class="text-2xl font-bold text-gray-800">📋 Avaliação Técnica</h2>
+      <p class="text-gray-500 text-sm">Registro inicial de problemas e dados do veículo</p>
+    </div>
+    <button
+      (click)="gerarPDF()"
+      class="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded shadow-sm transition-colors font-bold flex items-center"
+    >
+      <span class="mr-2">🖨️</span> Imprimir & Salvar
+    </button>
+  </div>
+
+  <div class="space-y-6">
+    <div class="bg-white shadow-sm rounded-lg border border-gray-200">
+      <div class="px-6 py-4 bg-gray-50 border-b border-gray-200 flex justify-between items-center">
+        <h3 class="text-lg font-semibold text-gray-800 italic">Dados do cliente</h3>
+        <span
+          *ngIf="clienteId"
+          class="text-xs font-bold text-green-600 bg-green-100 px-2 py-1 rounded"
+          >✅ Cliente Selecionado</span
+        >
+      </div>
+      <div class="p-6 grid grid-cols-1 md:grid-cols-12 gap-6">
+        <div class="md:col-span-12 relative">
+          <label class="block text-xs font-bold text-blue-600 uppercase mb-1"
+            >Nome (Digite para auto-completar)</label
+          >
+          <input
+            type="text"
+            [(ngModel)]="form.cliente"
+            (ngModelChange)="buscarCliente()"
+            class="w-full border-b-2 border-blue-200 focus:border-blue-500 outline-none py-1 bg-transparent"
+            placeholder="Ex: Leandro Meca"
+            autocomplete="off"
+          />
+
+          @if (clientesEncontrados.length > 0) {
+            <ul
+              class="absolute z-10 w-full bg-white border border-gray-200 shadow-xl rounded-b-lg max-h-48 overflow-y-auto top-full left-0 mt-1"
+            >
+              @for (cli of clientesEncontrados; track cli.id) {
+                <li
+                  (click)="selecionarClienteDaLista(cli)"
+                  class="px-4 py-3 hover:bg-blue-50 cursor-pointer border-b border-gray-100 transition-colors flex justify-between items-center group"
+                >
+                  <span class="font-bold text-blue-800 group-hover:text-blue-600">{{
+                    cli.nome
+                  }}</span>
+                  <span class="text-xs text-gray-500"
+                    >Cel: {{ cli.celular || cli.telefone || 'N/A' }}</span
+                  >
+                </li>
+              }
+            </ul>
+          }
+        </div>
+
+        <div class="md:col-span-4">
+          <label class="block text-xs font-bold text-gray-600 uppercase mb-1"
+            >Telefone Residencial</label
+          >
+          <input
+            type="text"
+            [(ngModel)]="form.telefone"
+            class="w-full border-b border-gray-300 focus:border-blue-500 outline-none py-1 bg-transparent"
+          />
+        </div>
+        <div class="md:col-span-4">
+          <label class="block text-xs font-bold text-gray-600 uppercase mb-1">Celular</label>
+          <input
+            type="text"
+            [(ngModel)]="form.celular"
+            class="w-full border-b border-gray-300 focus:border-blue-500 outline-none py-1 bg-transparent"
+          />
+        </div>
+      </div>
+    </div>
+
+    <div class="bg-white shadow-sm rounded-lg border border-gray-200">
+      <div class="px-6 py-4 bg-gray-50 border-b border-gray-200 flex justify-between items-center">
+        <h3 class="text-lg font-semibold text-gray-800 italic">Informações do Veículo e Relato</h3>
+        <span
+          *ngIf="veiculoId"
+          class="text-xs font-bold text-green-600 bg-green-100 px-2 py-1 rounded"
+          >✅ Veículo Vinculado</span
+        >
+      </div>
+
+      <div class="p-6">
+        @if (veiculosDoCliente.length > 0) {
+          <div class="mb-8 border border-blue-200 rounded-lg overflow-hidden animate-fade-in">
+            <div
+              class="bg-blue-50 px-4 py-3 border-b border-blue-200 text-sm font-bold text-blue-800 flex items-center justify-between"
+            >
+              <span>Carros de {{ form.cliente }}: Clique num veículo para selecioná-lo</span>
+              <span class="bg-blue-200 text-blue-800 px-2 py-1 rounded text-xs"
+                >Total: {{ veiculosDoCliente.length }}</span
+              >
+            </div>
+            <table class="min-w-full divide-y divide-gray-200">
+              <thead class="bg-white">
+                <tr>
+                  <th class="px-4 py-2 text-left text-xs font-bold text-gray-500 uppercase">
+                    Placa
+                  </th>
+                  <th class="px-4 py-2 text-left text-xs font-bold text-gray-500 uppercase">
+                    Modelo
+                  </th>
+                  <th class="px-4 py-2 text-left text-xs font-bold text-gray-500 uppercase">
+                    Marca
+                  </th>
+                  <th class="px-4 py-2 text-left text-xs font-bold text-gray-500 uppercase">
+                    Ação
+                  </th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-gray-100 bg-white">
+                @for (v of veiculosDoCliente; track v.id) {
+                  <tr
+                    (click)="selecionarVeiculoDaLista(v)"
+                    class="hover:bg-blue-50 cursor-pointer transition-colors group"
+                  >
+                    <td class="px-4 py-3 text-sm font-mono font-bold text-gray-800">
+                      {{ v.placa }}
+                    </td>
+                    <td class="px-4 py-3 text-sm font-medium">{{ v.modelo }}</td>
+                    <td class="px-4 py-3 text-sm text-gray-600">{{ v.marca || '-' }}</td>
+                    <td class="px-4 py-3 text-sm">
+                      <span class="text-blue-600 font-semibold group-hover:underline"
+                        >Selecionar &rarr;</span
+                      >
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        }
+
+        <div class="grid grid-cols-1 md:grid-cols-12 gap-4 mb-8">
+          <div class="md:col-span-2">
+            <label class="block text-xs font-bold text-blue-600 uppercase mb-1"
+              >Placa (Busca manual)</label
+            >
+            <input
+              type="text"
+              [(ngModel)]="form.placa"
+              (ngModelChange)="buscarVeiculo()"
+              class="w-full border-b-2 border-blue-200 focus:border-blue-500 outline-none py-1 bg-transparent font-mono uppercase"
+            />
+          </div>
+          <div class="md:col-span-3">
+            <label class="block text-xs font-bold text-gray-600 uppercase mb-1"
+              >Veículo / Modelo</label
+            >
+            <input
+              type="text"
+              [(ngModel)]="form.veiculo"
+              class="w-full border-b border-gray-300 focus:border-blue-500 outline-none py-1 bg-transparent"
+            />
+          </div>
+          <div class="md:col-span-3">
+            <label class="block text-xs font-bold text-gray-600 uppercase mb-1">Marca</label>
+            <input
+              type="text"
+              [(ngModel)]="form.marca"
+              class="w-full border-b border-gray-300 focus:border-blue-500 outline-none py-1 bg-transparent"
+            />
+          </div>
+          <div class="md:col-span-2">
+            <label class="block text-xs font-bold text-gray-600 uppercase mb-1">Cor</label>
+            <input
+              type="text"
+              [(ngModel)]="form.cor"
+              class="w-full border-b border-gray-300 focus:border-blue-500 outline-none py-1 bg-transparent"
+            />
+          </div>
+          <div class="md:col-span-2">
+            <label class="block text-xs font-bold text-gray-600 uppercase mb-1">Ano</label>
+            <input
+              type="text"
+              [(ngModel)]="form.ano"
+              class="w-full border-b border-gray-300 focus:border-blue-500 outline-none py-1 bg-transparent"
+            />
+          </div>
+        </div>
+
+        <div class="mb-8">
+          <label class="block text-xs font-bold text-gray-600 uppercase mb-2"
+            >Descrição da Ocorrência pelo Cliente</label
+          >
+          <textarea
+            [(ngModel)]="form.relato"
+            rows="3"
+            class="w-full border border-gray-300 rounded-md focus:border-blue-500 outline-none p-3 bg-gray-50 resize-y"
+          ></textarea>
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-gray-600 uppercase mb-2"
+            >Tabela de Avaliação (Checklist Inicial)</label
+          >
+          <div class="overflow-hidden rounded-lg border border-gray-200">
+            <table class="min-w-full divide-y divide-gray-200">
+              <thead class="bg-gray-800 text-white">
+                <tr>
+                  <th class="px-4 py-2 text-left text-xs font-bold uppercase w-1/4">Item</th>
+                  <th class="px-4 py-2 text-center text-xs font-bold uppercase w-1/4">Status</th>
+                  <th class="px-4 py-2 text-left text-xs font-bold uppercase w-1/2">Observação</th>
+                </tr>
+              </thead>
+              <tbody class="bg-white divide-y divide-gray-100">
+                @for (item of itensAvaliacao; track item.item) {
+                  <tr>
+                    <td class="px-4 py-2 text-sm font-medium text-gray-800">{{ item.item }}</td>
+                    <td class="px-4 py-2 text-center">
+                      <select
+                        [(ngModel)]="item.status"
+                        class="border border-gray-300 rounded px-2 py-1 text-sm outline-none font-bold"
+                        [ngClass]="{
+                          'text-green-600': item.status === 'OK',
+                          'text-yellow-600': item.status === 'ALERTA',
+                          'text-red-600': item.status === 'CRÍTICO',
+                        }"
+                      >
+                        <option value="OK">OK</option>
+                        <option value="ALERTA">ALERTA</option>
+                        <option value="CRÍTICO">CRÍTICO</option>
+                      </select>
+                    </td>
+                    <td class="px-4 py-2">
+                      <input
+                        type="text"
+                        [(ngModel)]="item.observacao"
+                        class="w-full border-b border-transparent focus:border-blue-500 text-sm outline-none"
+                      />
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

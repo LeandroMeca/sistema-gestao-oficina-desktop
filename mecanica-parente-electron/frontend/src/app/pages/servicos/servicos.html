@@ -1,0 +1,110 @@
+<div class="max-w-6xl mx-auto pb-10 animate-fade-in">
+  <div class="mb-6">
+    <h2 class="text-2xl font-bold text-gray-800">🛠️ Cadastro de Serviços</h2>
+    <p class="text-gray-500 text-sm">Gira os tipos de mão de obra e serviços da oficina</p>
+  </div>
+
+  <div class="space-y-6">
+    <div class="bg-white shadow-sm rounded-lg border border-gray-200">
+      <div class="px-6 py-4 bg-gray-50 border-b border-gray-200">
+        <h3 class="text-lg font-semibold text-gray-800 italic">Informações do Serviço</h3>
+      </div>
+
+      <div class="p-6">
+        <div class="grid grid-cols-1 md:grid-cols-12 gap-6">
+          <div class="md:col-span-2">
+            <label class="block text-xs font-bold text-gray-600 uppercase mb-1">Código</label>
+            <input
+              type="text"
+              [(ngModel)]="servicoForm.codigo"
+              class="w-full border-b border-gray-300 focus:border-blue-500 outline-none py-1 bg-transparent font-mono"
+              placeholder="Ex: 20"
+            />
+          </div>
+
+          <div class="md:col-span-6">
+            <label class="block text-xs font-bold text-gray-600 uppercase mb-1">Nome</label>
+            <input
+              type="text"
+              [(ngModel)]="servicoForm.nome"
+              class="w-full border-b border-gray-300 focus:border-blue-500 outline-none py-1 bg-transparent"
+              placeholder="Ex: Troca de vela"
+            />
+          </div>
+
+          <div class="md:col-span-2">
+            <label class="block text-xs font-bold text-gray-600 uppercase mb-1">Preço (R$)</label>
+            <input
+              type="text"
+              [(ngModel)]="servicoForm.preco"
+              class="w-full border-b border-gray-300 focus:border-blue-500 outline-none py-1 bg-transparent font-bold text-blue-700"
+              placeholder="0,00"
+            />
+          </div>
+
+          <div class="md:col-span-2">
+            <label class="block text-xs font-bold text-gray-600 uppercase mb-1"
+              >Possível Retorno / Km</label
+            >
+            <input
+              type="text"
+              [(ngModel)]="servicoForm.retornoKm"
+              class="w-full border-b border-gray-300 focus:border-blue-500 outline-none py-1 bg-transparent"
+              placeholder="Ex: 1000"
+            />
+          </div>
+        </div>
+
+        <div class="mt-8 pt-5 border-t border-gray-100 flex justify-end gap-3">
+          <button
+            (click)="limparFormulario()"
+            class="px-6 py-2 border border-gray-300 text-gray-600 hover:bg-gray-100 rounded transition-colors font-semibold shadow-sm"
+          >
+            Limpar
+          </button>
+          <button
+            (click)="salvarServico()"
+            class="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded shadow-sm transition-colors font-bold"
+          >
+            Salvar Serviço
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="bg-white shadow-sm rounded-lg border border-gray-200 overflow-hidden">
+      <table class="min-w-full divide-y divide-gray-200">
+        <thead class="bg-gray-50">
+          <tr>
+            <th class="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase">Cod</th>
+            <th class="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase">Nome</th>
+            <th class="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase">Preço</th>
+            <th class="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase">
+              Retorno (Km)
+            </th>
+          </tr>
+        </thead>
+        <tbody class="bg-white divide-y divide-gray-100">
+          @for (servico of listaServicos; track servico.id) {
+            <tr class="hover:bg-blue-50 transition-colors cursor-pointer">
+              <td class="px-6 py-4 text-sm text-gray-500 font-mono">
+                {{ servico.codigo || servico.id }}
+              </td>
+              <td class="px-6 py-4 text-sm font-bold text-gray-900">{{ servico.nome }}</td>
+              <td class="px-6 py-4 text-sm text-green-600 font-bold">
+                R$ {{ servico.preco || '0,00' }}
+              </td>
+              <td class="px-6 py-4 text-sm text-gray-600">{{ servico.retornoKm || '-' }}</td>
+            </tr>
+          } @empty {
+            <tr>
+              <td colspan="4" class="px-6 py-6 text-center text-gray-500">
+                Nenhum serviço cadastrado.
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

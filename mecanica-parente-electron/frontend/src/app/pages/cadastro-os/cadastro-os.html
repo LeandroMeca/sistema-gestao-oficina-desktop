@@ -1,0 +1,495 @@
+<div class="max-w-6xl mx-auto pb-10 animate-fade-in">
+  <div class="mb-4 flex justify-between items-end">
+    <div>
+      <h2 class="text-2xl font-bold text-gray-800">📝 Ordem de Serviço</h2>
+      <p class="text-gray-500 text-sm">Abertura e gestão de ordens de serviço da oficina</p>
+    </div>
+    <div class="flex gap-2 flex-wrap justify-end">
+      <button
+        class="px-3 py-1.5 border border-gray-300 bg-white text-gray-700 rounded shadow-sm font-semibold hover:bg-gray-50 text-sm"
+      >
+        Visualizar
+      </button>
+      <button
+        class="px-3 py-1.5 border border-gray-300 bg-white text-gray-700 rounded shadow-sm font-semibold hover:bg-gray-50 text-sm"
+      >
+        Limpar OS
+      </button>
+      <button
+        (click)="gerarPDF()"
+        class="px-4 py-1.5 bg-green-600 hover:bg-green-700 text-white rounded shadow-sm font-bold text-sm"
+      >
+        Finalizar OS E Imprimir
+      </button>
+    </div>
+  </div>
+
+  <div
+    class="border-b border-gray-200 mb-6 bg-white rounded-t-lg shadow-sm px-4 pt-4 overflow-x-auto"
+  >
+    <nav class="-mb-px flex space-x-6 min-w-max">
+      <button
+        (click)="setAba('abertura')"
+        [class]="
+          abaAtiva === 'abertura'
+            ? 'border-blue-600 text-blue-600 py-3 px-2 border-b-2 font-bold text-sm'
+            : 'border-transparent text-gray-500 hover:text-gray-700 py-3 px-2 border-b-2 font-medium text-sm'
+        "
+      >
+        1. Abertura
+      </button>
+      <button
+        (click)="setAba('complementos')"
+        [class]="
+          abaAtiva === 'complementos'
+            ? 'border-blue-600 text-blue-600 py-3 px-2 border-b-2 font-bold text-sm'
+            : 'border-transparent text-gray-500 hover:text-gray-700 py-3 px-2 border-b-2 font-medium text-sm'
+        "
+      >
+        2. Diagnóstico
+      </button>
+      <button
+        (click)="setAba('itens')"
+        [class]="
+          abaAtiva === 'itens'
+            ? 'border-blue-600 text-blue-600 py-3 px-2 border-b-2 font-bold text-sm'
+            : 'border-transparent text-gray-500 hover:text-gray-700 py-3 px-2 border-b-2 font-medium text-sm'
+        "
+      >
+        3. Produtos & Serviços
+      </button>
+      <button
+        (click)="setAba('finalizacao')"
+        [class]="
+          abaAtiva === 'finalizacao'
+            ? 'border-blue-600 text-blue-600 py-3 px-2 border-b-2 font-bold text-sm'
+            : 'border-transparent text-gray-500 hover:text-gray-700 py-3 px-2 border-b-2 font-medium text-sm'
+        "
+      >
+        4. Fechamento
+      </button>
+    </nav>
+  </div>
+
+  @if (abaAtiva === 'abertura') {
+    <div class="space-y-6">
+      <div class="bg-white shadow-sm rounded-lg border border-gray-200 p-6 relative">
+        <h3 class="text-lg font-semibold text-gray-800 mb-4 border-b pb-2 flex justify-between">
+          <span>Informações do Cliente</span>
+          <span *ngIf="clienteSelecionado" class="text-green-600 text-sm">✅ Vinculado</span>
+        </h3>
+
+        <div class="grid grid-cols-1 md:grid-cols-12 gap-4">
+          <div class="md:col-span-12 relative">
+            <label class="block text-xs font-bold text-blue-600 uppercase mb-1"
+              >Nome (Digite para auto-completar)</label
+            >
+            <input
+              type="text"
+              [(ngModel)]="nomeBusca"
+              (ngModelChange)="buscarCliente()"
+              class="w-full border-b-2 border-blue-200 focus:border-blue-500 outline-none py-1 bg-blue-50 px-2"
+              autocomplete="off"
+            />
+
+            @if (clientesEncontrados.length > 0) {
+              <ul
+                class="absolute z-10 w-full bg-white border border-gray-200 shadow-xl rounded-b-lg max-h-48 overflow-y-auto mt-1"
+              >
+                @for (cli of clientesEncontrados; track cli.id) {
+                  <li
+                    (click)="selecionarCliente(cli)"
+                    class="px-4 py-3 hover:bg-blue-50 cursor-pointer border-b flex justify-between"
+                  >
+                    <span class="font-bold text-blue-800">{{ cli.nome }}</span>
+                    <span class="text-xs text-gray-500">{{ cli.celular || cli.cpf }}</span>
+                  </li>
+                }
+              </ul>
+            }
+          </div>
+
+          <div class="md:col-span-6 mt-2">
+            <label class="block text-xs font-bold text-gray-600 uppercase"
+              >Telefone Residencial</label
+            >
+            <input
+              type="text"
+              [(ngModel)]="osDados.telefone"
+              class="w-full border-b border-gray-300 outline-none py-1"
+            />
+          </div>
+          <div class="md:col-span-6 mt-2">
+            <label class="block text-xs font-bold text-gray-600 uppercase">Celular</label>
+            <input
+              type="text"
+              [(ngModel)]="osDados.celular"
+              class="w-full border-b border-gray-300 outline-none py-1"
+            />
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-white shadow-sm rounded-lg border border-gray-200 p-6">
+        <h3 class="text-lg font-semibold text-gray-800 mb-4 border-b pb-2 flex justify-between">
+          <span>Selecione o Veículo</span>
+          <span *ngIf="veiculoSelecionado" class="text-green-600 text-sm">✅ Vinculado</span>
+        </h3>
+
+        @if (veiculosDoCliente.length > 0) {
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            @for (v of veiculosDoCliente; track v.id) {
+              <div
+                (click)="selecionarVeiculo(v)"
+                [class]="
+                  veiculoSelecionado?.id === v.id
+                    ? 'border-blue-500 bg-blue-50 ring-2 ring-blue-300'
+                    : 'border-gray-200'
+                "
+                class="border-2 p-4 rounded-lg cursor-pointer hover:border-blue-300 transition-all"
+              >
+                <p class="font-bold font-mono uppercase text-lg">{{ v.placa }}</p>
+                <p class="text-sm text-gray-600">{{ v.modelo }} - {{ v.marca }} ({{ v.ano }})</p>
+              </div>
+            }
+          </div>
+        } @else {
+          <p class="text-sm text-gray-500 italic">Busque um cliente para ver os veículos.</p>
+        }
+      </div>
+
+      <div class="flex justify-end">
+        <button
+          (click)="setAba('complementos')"
+          class="px-6 py-2 bg-blue-600 text-white rounded font-bold shadow hover:bg-blue-700"
+        >
+          Próximo ➔
+        </button>
+      </div>
+    </div>
+  }
+
+  @if (abaAtiva === 'complementos') {
+    <div class="space-y-6">
+      <div class="bg-white shadow-sm rounded-lg border border-gray-200 p-6">
+        <div class="mb-4">
+          <label class="block text-xs font-bold text-gray-800 uppercase mb-2"
+            >Informações do Cliente
+            <span class="text-gray-400 font-normal normal-case">(Defeito Relatado)</span></label
+          >
+          <textarea
+            [(ngModel)]="osDados.defeitoRelatado"
+            rows="3"
+            class="w-full border border-gray-300 rounded p-2 outline-none bg-gray-50 focus:border-blue-500"
+          ></textarea>
+        </div>
+
+        <div class="mb-6">
+          <label class="block text-xs font-bold text-gray-800 uppercase mb-2"
+            >Informações do Técnico
+            <span class="text-gray-400 font-normal normal-case">(Laudo Técnico)</span></label
+          >
+          <textarea
+            [(ngModel)]="osDados.laudoTecnico"
+            rows="3"
+            class="w-full border border-gray-300 rounded p-2 outline-none bg-gray-50 focus:border-blue-500"
+          ></textarea>
+        </div>
+
+        <div
+          class="bg-blue-50 p-4 rounded-lg border border-blue-100 flex flex-wrap gap-4 items-end"
+        >
+          <div class="w-32">
+            <label class="block text-xs font-bold text-gray-700 uppercase">Quilometragem</label>
+            <input
+              type="text"
+              [(ngModel)]="osDados.kmAtual"
+              class="w-full border-b border-gray-300 bg-transparent outline-none py-1"
+            />
+          </div>
+
+          <div class="w-36">
+            <label class="block text-xs font-bold text-gray-700 uppercase">Data de Entrega</label>
+            <input
+              type="text"
+              [(ngModel)]="osDados.dataEntrega"
+              placeholder="DD/MM/AAAA"
+              class="w-full border-b border-gray-300 bg-transparent outline-none py-1"
+            />
+          </div>
+
+          <div class="w-32">
+            <label class="block text-xs font-bold text-gray-700 uppercase">Hora de Entrega</label>
+            <input
+              type="text"
+              [(ngModel)]="osDados.horaEntrega"
+              placeholder="00:00"
+              class="w-full border-b border-gray-300 bg-transparent outline-none py-1"
+            />
+          </div>
+
+          <div class="w-24">
+            <label class="block text-xs font-bold text-gray-700 uppercase">Garantia (Meses)</label>
+            <select
+              [(ngModel)]="osDados.garantia"
+              class="w-full border-b border-gray-300 bg-transparent outline-none py-1"
+            >
+              <option>1</option>
+              <option>3</option>
+              <option>6</option>
+            </select>
+          </div>
+
+          <div class="flex-1 min-w-[150px]">
+            <label class="block text-xs font-bold text-gray-700 uppercase"
+              >Técnico Responsável</label
+            >
+            <select
+              [(ngModel)]="osDados.tecnico"
+              class="w-full border-b border-gray-300 bg-transparent outline-none py-1 font-bold text-blue-700"
+            >
+              <option value="">Selecione o mecânico...</option>
+              @for (f of listaFuncionarios; track f.id) {
+                <option [value]="f.nome">{{ f.nome }}</option>
+              }
+            </select>
+          </div>
+        </div>
+
+        <div class="mt-6 flex justify-end items-center border-t pt-4">
+          <button
+            (click)="setAba('itens')"
+            class="px-6 py-2 bg-blue-600 text-white rounded font-bold shadow hover:bg-blue-700"
+          >
+            Próximo ➔
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+
+  @if (abaAtiva === 'itens') {
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div class="space-y-6">
+        <div class="bg-white shadow-sm rounded-lg border border-cyan-300 p-1">
+          <div class="bg-cyan-50 px-4 py-2 border-b border-cyan-100 font-bold text-cyan-800">
+            Catálogo de Produtos
+          </div>
+          <div class="p-3 h-48 overflow-y-auto">
+            @for (p of estoqueProdutos; track p.id) {
+              <div class="flex justify-between items-center py-2 border-b text-sm hover:bg-gray-50">
+                <span>{{ p.nome }} (Estq: {{ p.quantidadeEstoque || 0 }})</span>
+                <div class="flex items-center gap-3">
+                  <span class="font-bold">R$ {{ p.precoVenda }}</span>
+                  <button
+                    (click)="adicionarItem(p, 'PRODUTO')"
+                    class="px-2 py-1 bg-blue-100 text-blue-700 font-bold rounded hover:bg-blue-200"
+                  >
+                    +
+                  </button>
+                </div>
+              </div>
+            }
+          </div>
+        </div>
+
+        <div class="bg-white shadow-sm rounded-lg border border-cyan-300 p-1">
+          <div class="bg-cyan-50 px-4 py-2 border-b border-cyan-100 font-bold text-cyan-800">
+            Tabela de Serviços
+          </div>
+          <div class="p-3 h-48 overflow-y-auto">
+            @for (s of tabelaServicos; track s.id) {
+              <div class="flex justify-between items-center py-2 border-b text-sm hover:bg-gray-50">
+                <span>{{ s.nome }}</span>
+                <div class="flex items-center gap-3">
+                  <span class="font-bold text-green-700">R$ {{ s.preco }}</span>
+                  <button
+                    (click)="adicionarItem(s, 'SERVICO')"
+                    class="px-2 py-1 bg-green-100 text-green-700 font-bold rounded hover:bg-green-200"
+                  >
+                    +
+                  </button>
+                </div>
+              </div>
+            }
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-gray-800 text-white p-6 rounded-lg shadow-lg flex flex-col">
+        <h3 class="font-bold mb-4 text-blue-400 uppercase">Itens da OS</h3>
+        <div class="flex-grow overflow-y-auto max-h-96">
+          <table class="w-full text-sm">
+            <thead>
+              <tr class="border-b border-gray-600 text-gray-400">
+                <th class="text-left pb-2">Item</th>
+                <th class="pb-2">Valor</th>
+                <th class="pb-2">Qtd</th>
+                <th class="text-right pb-2">Sub</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (item of itensAdicionados; track $index) {
+                <tr class="border-b border-gray-700">
+                  <td class="py-2">
+                    <p>{{ item.nome }}</p>
+                    <span
+                      class="text-[10px]"
+                      [ngClass]="item.tipo === 'PRODUTO' ? 'text-blue-300' : 'text-green-300'"
+                      >{{ item.tipo }}</span
+                    >
+                  </td>
+                  <td class="text-center">R$ {{ item.preco.toFixed(2) }}</td>
+                  <td class="text-center">
+                    <input
+                      type="number"
+                      [(ngModel)]="item.quantidade"
+                      class="w-12 bg-gray-700 border border-gray-600 rounded text-center text-white py-1"
+                    />
+                  </td>
+                  <td class="text-right font-bold">
+                    R$ {{ (item.preco * item.quantidade).toFixed(2) }}
+                  </td>
+                  <td class="text-right">
+                    <button
+                      (click)="removerItem($index)"
+                      class="text-red-400 hover:text-red-300 font-bold ml-2"
+                    >
+                      X
+                    </button>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+        <div class="mt-4 flex justify-end">
+          <button
+            (click)="setAba('finalizacao')"
+            class="px-6 py-2 bg-blue-600 text-white rounded font-bold hover:bg-blue-700"
+          >
+            Finalizar ➔
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+
+  @if (abaAtiva === 'finalizacao') {
+    <div class="space-y-6">
+      <div class="flex gap-4">
+        <div class="flex-1 bg-white border border-gray-200 rounded p-4">
+          <h4 class="font-bold text-gray-700 mb-2">Peças Lançadas</h4>
+          <table class="min-w-full text-sm border">
+            <thead class="bg-gray-50 border-b">
+              <tr>
+                <th class="p-1.5 text-left">Nome</th>
+                <th class="p-1.5 text-left">Valor Un.</th>
+                <th class="p-1.5 text-left">Qtd</th>
+                <th class="p-1.5 text-left">Total</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (item of itensAdicionados; track $index) {
+                @if (item.tipo === 'PRODUTO') {
+                  <tr class="bg-white border-b">
+                    <td class="p-1.5">{{ item.nome }}</td>
+                    <td class="p-1.5">R$ {{ item.preco.toFixed(2) }}</td>
+                    <td class="p-1.5">{{ item.quantidade }}</td>
+                    <td class="p-1.5 font-bold">
+                      R$ {{ (item.preco * item.quantidade).toFixed(2) }}
+                    </td>
+                  </tr>
+                }
+              }
+            </tbody>
+          </table>
+        </div>
+        <div class="w-40 flex flex-col items-center justify-center bg-gray-50 border rounded p-4">
+          <span class="text-gray-600 text-sm font-bold text-center">Subtotal Peças</span>
+          <span class="text-xl font-bold my-2 text-blue-700">R$ {{ totalPecas.toFixed(2) }}</span>
+        </div>
+      </div>
+
+      <div class="flex gap-4">
+        <div class="flex-1 bg-white border border-gray-200 rounded p-4">
+          <h4 class="font-bold text-gray-700 mb-2">Serviços Realizados</h4>
+          <table class="min-w-full text-sm border">
+            <thead class="bg-gray-50 border-b">
+              <tr>
+                <th class="p-1.5 text-left">Nome</th>
+                <th class="p-1.5 text-left">Valor Un.</th>
+                <th class="p-1.5 text-left">Qtd</th>
+                <th class="p-1.5 text-left">Total</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (item of itensAdicionados; track $index) {
+                @if (item.tipo === 'SERVICO') {
+                  <tr class="bg-white border-b">
+                    <td class="p-1.5">{{ item.nome }}</td>
+                    <td class="p-1.5">R$ {{ item.preco.toFixed(2) }}</td>
+                    <td class="p-1.5">{{ item.quantidade }}</td>
+                    <td class="p-1.5 font-bold">
+                      R$ {{ (item.preco * item.quantidade).toFixed(2) }}
+                    </td>
+                  </tr>
+                }
+              }
+            </tbody>
+          </table>
+        </div>
+        <div class="w-40 flex flex-col items-center justify-center bg-gray-50 border rounded p-4">
+          <span class="text-gray-600 text-sm font-bold text-center">Subtotal M.O.</span>
+          <span class="text-xl font-bold my-2 text-green-700"
+            >R$ {{ totalServicos.toFixed(2) }}</span
+          >
+        </div>
+      </div>
+
+      <div class="flex justify-between items-end mt-8">
+        <div class="bg-white border border-gray-200 p-6 rounded-lg shadow-sm w-1/2">
+          <h4 class="font-bold text-gray-700 mb-4 text-sm">Formas de pagamentos</h4>
+          <div class="flex gap-4">
+            <div class="flex-1">
+              <label class="block text-xs font-bold text-gray-600 mb-1">Tipo de Pagamento</label>
+              <select
+                [(ngModel)]="osDados.tipoPagamento"
+                class="w-full border border-gray-300 rounded p-1.5"
+              >
+                <option>Débito</option>
+                <option>Crédito</option>
+                <option>Dinheiro</option>
+                <option>PIX</option>
+              </select>
+            </div>
+            <div class="flex-1">
+              <label class="block text-xs font-bold text-gray-600 mb-1"
+                >Quantidade de parcelas</label
+              >
+              <select
+                [(ngModel)]="osDados.parcelas"
+                class="w-full border border-gray-300 rounded p-1.5"
+              >
+                <option>1</option>
+                <option>2</option>
+                <option>3</option>
+                <option>4</option>
+                <option>5</option>
+                <option>6</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div class="text-right">
+          <div class="mb-4">
+            <span class="text-gray-600 font-bold mr-4 text-xl">Valor Total:</span>
+            <span class="text-4xl font-black text-green-600">R$ {{ totalGeral.toFixed(2) }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  }
+</div>
