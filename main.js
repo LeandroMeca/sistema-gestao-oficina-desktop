@@ -1,4 +1,4 @@
-const { app, BrowserWindow, ipcMain } = require("electron");
+const { app, BrowserWindow, ipcMain, shell } = require("electron");
 const fs = require("fs");
 const path = require("path");
 const { AppDataSource } = require("./database/data-source");
@@ -87,7 +87,7 @@ async function createWindow() {
     }
   } else {
     // MODO DESENVOLVIMENTO
-    const appUrl = "http://localhost:4200";
+    const appUrl = "http://localhost:4201";
     try {
       await waitForServer(appUrl);
       await mainWindow.loadURL(appUrl);
@@ -339,7 +339,9 @@ handleWithLogging("salvar-oficina", async (event, dadosOficina) => {
   // Se existir id, atualiza; caso contrário cria novo
   if (dadosOficina.id) {
     await repo.update(dadosOficina.id, dadosOficina);
-    const oficinaAtualizada = await repo.findOne({ where: { id: dadosOficina.id } });
+    const oficinaAtualizada = await repo.findOne({
+      where: { id: dadosOficina.id },
+    });
     return { success: true, oficina: oficinaAtualizada };
   } else {
     const novo = repo.create(dadosOficina);
@@ -352,4 +354,68 @@ handleWithLogging("listar-oficinas", async () => {
   const repo = AppDataSource.getRepository("Oficina");
   const oficinas = await repo.find();
   return { success: true, oficinas };
+});
+
+// ==============================================================================
+// HANDLERS DE DOCUMENTOS (LER PASTAS E ABRIR PDF)
+// ==============================================================================
+ipcMain.handle("listar-documentos-cliente", async (event, clienteNome) => {
+  try {
+    const baseDir = path.join(app.getPath("documents"), "Relatorios");
+
+    // O .trim() remove espaços vazios no final do nome do cliente!
+    const clienteLimpo = clienteNome
+      .toString()
+      .replace(/[\\/:*?"<>|]/g, "")
+      .trim();
+    const clienteDir = path.join(baseDir, clienteLimpo);
+
+    console.log("🕵️‍♂️ Procurando pasta do cliente em:", clienteDir);
+
+    if (!fs.existsSync(clienteDir)) {
+      console.log("❌ Pasta não encontrada no Windows!");
+      return { success: true, documentos: [] };
+    }
+
+    let documentos = [];
+    // Lê as pastas de serviço
+    const pastasServicos = fs
+      .readdirSync(clienteDir, { withFileTypes: true })
+      .filter((dirent) => dirent.isDirectory())
+      .map((dirent) => dirent.name);
+
+    console.log("📂 Pastas de serviços encontradas:", pastasServicos);
+
+    for (const servico of pastasServicos) {
+      const servicoDir = path.join(clienteDir, servico);
+      // Pega qualquer variação de .pdf ou .PDF
+      const arquivos = fs
+        .readdirSync(servicoDir)
+        .filter((file) => file.toLowerCase().endsWith(".pdf"));
+
+      for (const arquivo of arquivos) {
+        documentos.push({
+          servico: servico,
+          nomeArquivo: arquivo,
+          caminhoCompleto: path.join(servicoDir, arquivo),
+        });
+      }
+    }
+
+    console.log("✅ Total de PDFs encontrados:", documentos.length);
+    return { success: true, documentos };
+  } catch (error) {
+    console.error("❌ Erro ao listar documentos:", error);
+    return { success: false, error: error.message };
+  }
+});
+
+// Handler para abrir o PDF direto no leitor do Windows
+ipcMain.handle("abrir-documento", async (event, caminho) => {
+  try {
+    await shell.openPath(caminho);
+    return { success: true };
+  } catch (error) {
+    return { success: false, error: error.message };
+  }
 });

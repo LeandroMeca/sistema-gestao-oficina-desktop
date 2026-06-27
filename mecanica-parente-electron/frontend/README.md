@@ -1,72 +1,59 @@
-```markdown
 # Frontend
 
-Este projeto foi gerado usando o Angular CLI (versão 21.1.3).
+This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 21.1.3.
 
-## Servidor de desenvolvimento
+## Development server
 
-Para iniciar um servidor de desenvolvimento local, você pode executar:
+To start a local development server, run:
 
 ```bash
 ng serve
 ```
 
-Ou, se preferir usar as tasks disponíveis no workspace (recomendado no VS Code), use a task "npm: start" que roda o script "start" do `package.json`.
+Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
 
-Depois que o servidor estiver em execução, abra o navegador em `http://localhost:4200/`. A aplicação será recarregada automaticamente sempre que você modificar os arquivos de origem.
+## Code scaffolding
 
-## Gerar código (scaffolding)
-
-O Angular CLI fornece comandos para gerar componentes, diretivas, services, etc. Exemplo para criar um componente:
+Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
 
 ```bash
-ng generate component nome-do-componente
+ng generate component component-name
 ```
 
-Para ver todas as opções de geração e schematics disponíveis:
+For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
 
 ```bash
 ng generate --help
 ```
 
-## Build (compilação)
+## Building
 
-Para gerar uma versão de produção do projeto:
-
-```bash
-ng build --configuration production
-```
-
-Os artefatos de build serão colocados na pasta `dist/`. A build de produção aplica otimizações para melhorar desempenho e tamanho.
-
-## Executar testes unitários
-
-Para executar testes unitários (Vitest configurado no projeto), rode:
+To build the project run:
 
 ```bash
-npm test
+ng build
 ```
 
-Ou use a task "npm: test" no VS Code.
+This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
 
-## Testes end-to-end (E2E)
+## Running unit tests
 
-Se você quiser rodar testes end-to-end, configure um framework de E2E (por exemplo Playwright ou Protractor) e execute o comando correspondente, por exemplo:
+To execute unit tests with the [Vitest](https://vitest.dev/) test runner, use the following command:
+
+```bash
+ng test
+```
+
+## Running end-to-end tests
+
+For end-to-end (e2e) testing, run:
 
 ```bash
 ng e2e
 ```
 
-O Angular CLI não traz um framework E2E por padrão — escolha o que preferir e siga a documentação do framework escolhido.
+Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
 
-## Observações sobre Tailwind
+## Additional Resources
 
-Este projeto inclui Tailwind CSS. Se fizer alterações nas configurações do Tailwind (`tailwind.config.js`), pode ser necessário reiniciar o servidor de desenvolvimento para que as mudanças sejam aplicadas.
-
-## Recursos adicionais
-
-Para mais informações sobre o Angular CLI e seus comandos, consulte a documentação oficial:
-
-[Angular CLI — Overview and Command Reference](https://angular.dev/tools/cli)
-
-```
+For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.

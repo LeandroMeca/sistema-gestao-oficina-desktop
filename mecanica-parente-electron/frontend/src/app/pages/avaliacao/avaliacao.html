@@ -198,6 +198,19 @@
           ></textarea>
         </div>
 
+        <div class="mb-6">
+          <label class="block text-xs font-bold text-gray-600 uppercase mb-2">Técnico Responsável</label>
+          <select
+            [(ngModel)]="form.tecnico"
+            class="w-full border border-gray-300 rounded-md focus:border-blue-500 outline-none p-2 bg-white"
+          >
+            <option value="">Selecione o técnico...</option>
+            @for (f of listaFuncionarios; track f.id) {
+              <option [value]="f.nome">{{ f.nome }}</option>
+            }
+          </select>
+        </div>
+
         <div>
           <label class="block text-xs font-bold text-gray-600 uppercase mb-2"
             >Tabela de Avaliação (Checklist Inicial)</label

@@ -1,0 +1,64 @@
+<div class="p-6">
+  <h1 class="text-2xl font-bold mb-6 text-gray-800">Central de Documentos</h1>
+
+  <!-- Caixa de Pesquisa -->
+  <div class="bg-white p-4 rounded shadow mb-6">
+    <label class="block text-sm font-medium text-gray-700 mb-2">Buscar Cliente:</label>
+    <div class="flex gap-2">
+      <input
+        type="text"
+        [(ngModel)]="termoBusca"
+        (keyup.enter)="buscarCliente()"
+        class="border p-2 rounded w-full md:w-1/2"
+        placeholder="Digite o nome do cliente..."
+      />
+      <button
+        (click)="buscarCliente()"
+        class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+      >
+        Buscar
+      </button>
+    </div>
+
+    <!-- Resultados da Busca -->
+    <ul class="mt-2 border rounded bg-gray-50" *ngIf="clientesEncontrados.length > 0">
+      <li
+        *ngFor="let cliente of clientesEncontrados"
+        (click)="selecionarCliente(cliente)"
+        class="p-2 border-b cursor-pointer hover:bg-blue-100"
+      >
+        {{ cliente.nome }} (CPF: {{ cliente.cpf }})
+      </li>
+    </ul>
+  </div>
+
+  <!-- Lista de Documentos do Cliente -->
+  <div class="bg-white p-4 rounded shadow" *ngIf="clienteSelecionado">
+    <h2 class="text-xl font-semibold mb-4">
+      Documentos de: <span class="text-blue-600">{{ clienteSelecionado.nome }}</span>
+    </h2>
+
+    <div *ngIf="documentos.length === 0" class="text-gray-500">
+      Nenhum documento gerado para este cliente ainda.
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <!-- Card para cada PDF -->
+      <div
+        *ngFor="let doc of documentos"
+        class="border rounded p-4 flex items-center justify-between bg-gray-50 shadow-sm"
+      >
+        <div>
+          <p class="font-bold text-gray-800">{{ doc.nomeArquivo }}</p>
+          <p class="text-sm text-gray-500">Serviço: {{ doc.servico }}</p>
+        </div>
+        <button
+          (click)="abrirDocumento(doc.caminhoCompleto)"
+          class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 font-medium"
+        >
+          Abrir PDF
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

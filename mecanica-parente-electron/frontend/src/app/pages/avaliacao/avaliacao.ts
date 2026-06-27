@@ -3,6 +3,26 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import Swal from 'sweetalert2'; // 🌟 IMPORT DO SWEETALERT ADICIONADO AQUI
 
+function officeHeader(oficina: any) {
+  if (!oficina) {
+    return `
+      <div> - </div>
+    `;
+  }
+
+  const lines = [] as string[];
+  if (oficina.cidade || oficina.uf) {
+    lines.push(`${oficina.cidade || ''}${oficina.cidade && oficina.uf ? '-' : ''}${oficina.uf || ''}`);
+  }
+  if (oficina.nome) lines.push(`<div style="font-size:18px;font-weight:bold;margin:5px 0;">${oficina.nome}</div>`);
+  const addr = [oficina.endereco, oficina.endereco_numero].filter(Boolean).join(' ');
+  if (addr) lines.push(`<div>${addr} ${oficina.telefone ? ' (' + oficina.telefone + ')' : ''}</div>`);
+  if (oficina.cep) lines.push(`<div>CEP: ${oficina.cep}</div>`);
+  if (oficina.especialidades) lines.push(`<div>${oficina.especialidades}</div>`);
+
+  return lines.join('\n');
+}
+
 @Component({
   selector: 'app-avaliacao',
   standalone: true,
@@ -18,6 +38,8 @@ export class Avaliacao {
   // 🌟 NOVA VARIÁVEL: Para mostrar a listinha de nomes
   clientesEncontrados: any[] = [];
 
+  listaFuncionarios: any[] = []; // lista carregada do banco
+
   form = {
     cliente: '',
     telefone: '',
@@ -28,7 +50,7 @@ export class Avaliacao {
     ano: '',
     placa: '',
     relato: '',
-    tecnico: 'Sid',
+    tecnico: '', // agora será preenchido pela seleção do usuário
   };
 
   itensAvaliacao = [
@@ -40,6 +62,32 @@ export class Avaliacao {
   ];
 
   constructor(private cdr: ChangeDetectorRef) {}
+
+  async ngOnInit() {
+    // Carrega lista de funcionários para preencher o select de técnico
+    try {
+      const res = await (window as any).electronAPI.listarFuncionarios();
+      if (res && res.success) {
+        this.listaFuncionarios = res.funcionarios || [];
+        this.cdr.detectChanges();
+      }
+    } catch (err) {
+      console.error('Erro ao carregar funcionários para avaliação', err);
+    }
+    // Carrega dados da oficina (cabeçalho)
+    try {
+      const resOf = await (window as any).electronAPI.listarOficinas();
+      if (resOf && resOf.success && resOf.oficinas && resOf.oficinas.length > 0) {
+        // usa o primeiro registro como configuração da oficina
+        (this as any).oficinaInfo = resOf.oficinas[0];
+      } else {
+        (this as any).oficinaInfo = null;
+      }
+    } catch (err) {
+      console.error('Erro ao carregar dados da oficina', err);
+      (this as any).oficinaInfo = null;
+    }
+  }
 
   // ==========================================
   // BUSCA E AUTO-COMPLETAR INTELIGENTE
@@ -155,6 +203,8 @@ export class Avaliacao {
       )
       .join('');
 
+    const oficina = (this as any).oficinaInfo;
+
     const html = `
       <!doctype html>
       <html>
@@ -174,11 +224,7 @@ export class Avaliacao {
         </head>
         <body>
           <div style="text-align: center; margin-bottom: 20px; font-size: 12px; line-height: 1.4;">
-            <div>JACAREÍ-SP</div>
-            <div style="font-size: 18px; font-weight: bold; margin: 5px 0;">MECÂNICA PARENTE</div>
-            <div>AVENIDA MARIA AUGUSTA FAGUNDES GOMES 105 (12)3956-1806</div>
-            <div>CEP: 12322-300</div>
-            <div>ELÉTRICA-AUTO MECÂNICA-MECÂNICA DIESEL-INJEÇÃO ELETRÔNICA</div>
+            ${officeHeader(oficina)}
           </div>
 
           <div style="text-align: center; font-size: 16px; font-weight: bold;">Avaliação Técnica</div>

@@ -1,13 +1,5 @@
 # Oficina — App de Gestão de Oficina (Electron + Angular + TypeORM)
 
-<p align="center">
-  <img src="https://img.shields.io/badge/Electron-191970?style=for-the-badge&logo=Electron&logoColor=white" alt="Electron"/>
-  <img src="https://img.shields.io/badge/Angular-DD0031?style=for-the-badge&logo=angular&logoColor=white" alt="Angular"/>
-  <img src="https://img.shields.io/badge/Node.js-43853D?style=for-the-badge&logo=node.js&logoColor=white" alt="Node.js"/>
-  <img src="https://img.shields.io/badge/SQLite-07405E?style=for-the-badge&logo=sqlite&logoColor=white" alt="SQLite"/>
-  <img src="https://img.shields.io/badge/TypeORM-FE0803?style=for-the-badge&logo=typeorm&logoColor=white" alt="TypeORM"/>
-</p>
-
 Aplicação desktop feita com Electron e frontend em Angular para gerenciar clientes, veículos, funcionários, produtos/serviços e gerar documentos (PDF) como Avaliação Técnica e Orçamentos.
 
 - Projeto completo end-to-end (desktop app) com Electron + Angular.
@@ -18,11 +10,11 @@ Aplicação desktop feita com Electron e frontend em Angular para gerenciar clie
 
 Tecnologias principais
 
-* **[Electron](https://www.electronjs.org/)** (Desktop Wrapper)
-* **[Angular](https://angular.io/)** (Frontend / UI)
-* **[Node.js](https://nodejs.org/)** (Host Process / Backend)
-* **[SQLite](https://www.sqlite.org/)** + **[TypeORM](https://typeorm.io/)** (Database local via `database/data-source.js`)
-* **[SweetAlert2](https://sweetalert2.github.io/)** (UX Reativa para confirmações)
+- Electron (desktop)
+- Angular (frontend)
+- TypeORM + sqlite (database via `database/data-source.js`)
+- Node.js (host process)
+- SweetAlert2 (UX para confirmações)
 
 Quick Demo (local)
 

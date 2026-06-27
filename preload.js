@@ -5,6 +5,11 @@ contextBridge.exposeInMainWorld("electronAPI", {
   salvarPDF: (dados) => ipcRenderer.invoke("salvar-pdf", dados),
   printPDF: (options) => ipcRenderer.invoke("print-pdf", options),
 
+  // ADICIONE ESTAS DUAS LINHAS:
+  listarDocumentosCliente: (nomeCliente) =>
+    ipcRenderer.invoke("listar-documentos-cliente", nomeCliente),
+  abrirDocumento: (caminho) => ipcRenderer.invoke("abrir-documento", caminho),
+
   // clientes
   salvarCliente: (cliente) => ipcRenderer.invoke("salvar-cliente", cliente),
   listarClientes: () => ipcRenderer.invoke("listar-clientes"),
